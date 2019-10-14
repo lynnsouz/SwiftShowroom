@@ -9,12 +9,28 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    @State var showAlert = false
+    
     let rTarget = Double.random(in: 0..<1)
     let gTarget = Double.random(in: 0..<1)
     let bTarget = Double.random(in: 0..<1)
     @State var rGuess = Double.random(in: 0..<1)
     @State var gGuess = Double.random(in: 0..<1)
     @State var bGuess = Double.random(in: 0..<1)
+    
+    func Int255(_ number: Double) -> Int {
+        return Int(number * 255.0)
+    }
+    
+    func computeScore() -> Int {
+      let rDiff = rGuess - rTarget
+      let gDiff = gGuess - gTarget
+      let bDiff = bGuess - bTarget
+      let diff = sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff)
+      return Int((1.0 - diff) * 100.0 + 0.5)
+    }
+    
     var body: some View {
         VStack {
             HStack {
@@ -29,13 +45,23 @@ struct ContentView: View {
                     Rectangle()
                     .foregroundColor(Color(red: rGuess, green: gGuess, blue: bGuess, opacity: 1.0))
                     HStack {
-                      Text("R: \(Int(rGuess * 255.0))")
-                      Text("G: \(Int(gGuess * 255.0))")
-                      Text("B: \(Int(bGuess * 255.0))")
+                      Text("R: \(Int255(rGuess))")
+                      Text("G: \(Int255(gGuess))")
+                      Text("B: \(Int255(bGuess))")
                     }
                 }
             }
-            Text("Hit me button")
+            
+            
+            Button(action: {
+                self.showAlert = true
+            }) {
+              Text("Done!")
+            }
+            .padding()
+            .alert(isPresented: $showAlert) {
+              Alert(title: Text("Your Score"), message: Text("\(computeScore())"))
+            }
             
             VStack {
                 ColorSlider(value: $rGuess, textColor: .red)
